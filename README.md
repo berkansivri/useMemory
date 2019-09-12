@@ -1,4 +1,17 @@
+<p align="center">
+  <a href="https://react-hooks-memory-game.herokuapp.com/">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/768px-React-icon.svg.png" alt="Logo" width="210" height="150">
+  </a>
 
+  <h3 align="center">React Memory Game</h3>
+
+  <p align="center">
+    Memory Game implementation with React Hooks
+    <br />
+    <a target="_blank" href="https://react-hooks-memory-game.herokuapp.com/"><b>--- Live Server ---</b></a>
+  </p>
+</p>
+<hr />
 
 ### `npm start`
 

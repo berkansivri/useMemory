@@ -1,15 +1,16 @@
 import React, { useState, useReducer } from 'react'
 import getFrameworks from '../selectors/framework'
 import Card from './Card'
-import frameworkReducer from '../reducers/frameworks'
+import frameworkReducer from '../reducers/framework'
 import BoardContext from '../context/board-context'
 
 const Board = () => {
+  
   const frameworkNames = getFrameworks(12)
   const gameFrameworks = frameworkNames.map((name, index) => ({ name, index, isOpen: false, isMatch: false }))
 
   const [frameworks, dispatch] = useReducer(frameworkReducer, gameFrameworks)
-  const [openCard, setOpenCard] = useState(-1)
+  const [openCard, setOpenCard] = useState(null)
   const [wait, setWait] = useState(false)
 
   const handleCheckPairs = (index) => {
@@ -17,7 +18,7 @@ const Board = () => {
     
     setTimeout(() => {
       dispatch({ type:"CHECK", index, open: openCard })
-      setOpenCard(-1)
+      setOpenCard(null)
       setWait(false)
     }, 600)
   }
