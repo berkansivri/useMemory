@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useState, useReducer } from 'react'
 import getFrameworks from '../selectors/framework'
 import Card from './Card'
 import frameworkReducer from '../reducers/frameworks'
@@ -6,19 +6,28 @@ import BoardContext from '../context/board-context'
 
 const Board = () => {
   const frameworkNames = getFrameworks(12)
-  const gameFrameworks = []
+  const gameFrameworks = frameworkNames.map((name, index) => ({ name, index, isOpen: false, isMatch: false }))
 
-  for(let i = 0; i < frameworkNames.length; i++) {
-    gameFrameworks.push({ name: frameworkNames[i], index: i, isOpen: false, isMatch: false })
-  }
   const [frameworks, dispatch] = useReducer(frameworkReducer, gameFrameworks)
+  const [openCard, setOpenCard] = useState(-1)
+  const [wait, setWait] = useState(false)
+
+  const handleCheckPairs = (index) => {
+    setWait(true)
+    
+    setTimeout(() => {
+      dispatch({ type:"CHECK", index, open: openCard })
+      setOpenCard(-1)
+      setWait(false)
+    }, 600)
+  }
 
   return (
-    <BoardContext.Provider value={{ frameworks, dispatch }}>
+    <BoardContext.Provider value={{ dispatch, openCard, setOpenCard, wait }}>
       <div className="board">
         {frameworks.map((framework) => {
           return (
-            <Card key={framework.index} {...framework}/>
+            <Card key={framework.index} {...framework} check={handleCheckPairs}/>
           )
         })}
       </div>

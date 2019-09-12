@@ -1,20 +1,17 @@
 import React, { useContext } from 'react'
 import BoardContext from '../context/board-context'
-const Card = ({ index, name, isOpen }) => {
-  const { frameworks, dispatch } = useContext(BoardContext)
-
+const Card = ({ index, name, isOpen, isMatch, check }) => {
+  const { dispatch, openCard, setOpenCard, wait } = useContext(BoardContext)
   const handleCardClick = () => {
-    const hasOpenCard = frameworks.find(f => f.isOpen === true && f.isMatch === false)
-    console.log(hasOpenCard);
+    console.log(openCard);
+    if(wait || isMatch) return
     dispatch({ type:"OPEN", index })
-    if(hasOpenCard) {
-      setTimeout(() => {
-        dispatch({ type:"CHECK", index, open: hasOpenCard.index })
-      }, 600)
-    }
+    
+    if(openCard === -1) setOpenCard(index)
+    else check(index)
   }
   return (
-    <div className={"card" + (isOpen ? " opened" : "")} onClick={handleCardClick}>
+    <div className={"card" + (isOpen ? " opened" : "") + (isMatch ? " matched" : "")} onClick={handleCardClick}>
       <div className="front">
         ?
       </div>
