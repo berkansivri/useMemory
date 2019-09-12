@@ -6,7 +6,7 @@ const frameworkReducer = (state, action) => {
       state[action.index].isOpen = true 
       return [...state]
     case "CHECK":
-      const { index, open } = arrowFunctionExpression
+      const { index, open } = action
       if(state[index].name === state[open].name) {
         state[index].isMatch = true
         state[open].isMatch = true
