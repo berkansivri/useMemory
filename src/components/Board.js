@@ -1,18 +1,28 @@
-import React from 'react'
-import frameworks from '../selectors/framework'
+import React, { useReducer } from 'react'
+import getFrameworks from '../selectors/framework'
 import Card from './Card'
+import frameworkReducer from '../reducers/frameworks'
+import BoardContext from '../context/board-context'
 
 const Board = () => {
-  const randomFrameworks = frameworks(12)
-  const gameFrameworks = [...randomFrameworks, ...randomFrameworks]
+  const frameworkNames = getFrameworks(12)
+  const gameFrameworks = []
 
-  console.log(gameFrameworks);
+  for(let i = 0; i < frameworkNames.length; i++) {
+    gameFrameworks.push({ name: frameworkNames[i], index: i, isOpen: false, isMatch: false })
+  }
+  const [frameworks, dispatch] = useReducer(frameworkReducer, gameFrameworks)
+
   return (
-    <div className="board">
-      {gameFrameworks.map((framework,i) =>(
-        <Card key={i}/>
-      ))}
-    </div>
+    <BoardContext.Provider value={{ frameworks, dispatch }}>
+      <div className="board">
+        {frameworks.map((framework) => {
+          return (
+            <Card key={framework.index} {...framework}/>
+          )
+        })}
+      </div>
+    </BoardContext.Provider>
   )
 }
 
