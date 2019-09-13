@@ -9,7 +9,7 @@ const Home = ({ history }) => {
   const [name, setName] = useState("")
   
   const handleOnMultiplayerGame = () => {
-    database.ref("games").push({ turn: name }).then((ref) => {
+    database.ref("games").push({ player1:name, turn: name }).then((ref) => {
       localStorage.setItem("name", name)
       const frameworkNames = getFrameworks(12)
       const board = frameworkNames.map((name, index) => ({ name, index, isOpen: false, isMatch: false }))
