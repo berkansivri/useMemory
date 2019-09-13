@@ -1,7 +1,7 @@
 const frameworkReducer = (state, action) => {
   switch (action.type) {
     case "POPULATE":
-      break;
+      return action.board;
     case "OPEN":
       state[action.index].isOpen = true 
       return [...state]

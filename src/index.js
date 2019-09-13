@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import * as serviceWorker from './serviceWorker';
-import Board from './components/Board'
+import AppRouter from './routers/AppRouter'
 
-ReactDOM.render(<Board />, document.getElementById('root'));
+ReactDOM.render(<AppRouter />, document.getElementById('root'));
 
 serviceWorker.unregister();

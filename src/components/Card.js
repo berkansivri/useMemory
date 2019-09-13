@@ -5,6 +5,7 @@ const Card = ({ index, name, isOpen, isMatch, check }) => {
 
   const { dispatch, openCard, setOpenCard, wait } = useContext(BoardContext)
   const handleCardClick = () => {
+    console.log(wait);
     if(wait || isOpen || isMatch) return
     dispatch({ type:"OPEN", index })
     
