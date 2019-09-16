@@ -8,48 +8,42 @@ const Board = ({ match }) => {
   const gameId = match.params.id
   const [frameworks, dispatch] = useReducer(frameworkReducer, [])
   const [wait, setWait] = useState(false)
-  const [username, setUsername] = useState("")
-  const [against, setAgainst] = useState("")
-  const [turn, setTurn] = useState("")
+  const [players, setPlayers] = useState([])
+  const [turn, setTurn] = useState(0)
+  const [player, setPlayer] = useState({})
 
   useEffect(() => {
-    console.log(gameId);
-    const localUsername = localStorage.getItem("username")
-    console.log(localUsername);
-    if(localUsername) setUsername(localUsername)
+    const localPlayer = JSON.parse(localStorage.getItem("player"))
+    setPlayer(localPlayer)
     if(gameId) {
-      const turnWatcher = database.ref(`games/${gameId}/turn`)
-      turnWatcher.on("value", (snapshot) => {
-        const turnVal = snapshot.val()
-        console.log("turn:",turn);
-        console.log("username:",localUsername);
-        console.log(turn === localUsername);
-        setTurn(turnVal)
-        if(turnVal === localUsername) setWait(false)
+      
+      const turnRef = database.ref(`games/${gameId}/turn`)
+      turnRef.on("value", (snapshot) => {
+        const turnId = snapshot.val()
+        setTurn(turnId)
+        if(turnId === localPlayer.id) setWait(false)
         else setWait(true)
       })
-
-      database.ref(`games/${gameId}/player2`).on("value", (snapshot) => {
-        const player2 = snapshot.val()
-        if(player2 !== localUsername) {
-          setAgainst(player2)
-        } else {
-          database.ref(`games/${gameId}/player1`).once("value", (snapshot) => {
-            const player1 =snapshot.val()
-            setAgainst(player1)
-          })
-        }
+      
+      database.ref(`games/${gameId}/players`).on("value", (snapshot) => {
+        const users = snapshot.val()
+        console.log(users);
+        setPlayers([users])
       })
-
+      database.ref(`games/${gameId}/players/${localPlayer.id}`).onDisconnect({ isOnline: false })
+      
       database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
         const board = snapshot.val()
         if(board) dispatch({ type: "POPULATE", board })
       })
     }
-    // eslint-disable-next-line 
-  },[])
+    // eslint-disable-next-line
+  }, [])
   
-  const updateTurn = () => database.ref(`games/${gameId}`).update({ turn: against })
+  const updateTurn = () => {
+    const nextTurnIndex = (players.findIndex((user) => user.id === player.id) + 1) % players.length
+    database.ref(`games/${gameId}`).update({ turn: players[nextTurnIndex].id })
+  }
 
   useEffect(() => {
     if(frameworks.length > 0)
@@ -66,8 +60,8 @@ const Board = ({ match }) => {
         })}
       </div>
       <div>
-        {against && `${against} connected`}<br />
-        {turn && `Turn: ${turn}`}
+        {players.map((user) => user.name)} online.
+        {turn && `Turn: ${turn.name}`} <br />
       </div>
     </BoardContext.Provider>
   )
