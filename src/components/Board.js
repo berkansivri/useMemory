@@ -7,61 +7,40 @@ import database from '../firebase/firebase'
 const Board = ({ match }) => {
   const gameId = match.params.id
   const [frameworks, dispatch] = useReducer(frameworkReducer, [])
-  const [openCard, setOpenCard] = useState(null)
   const [wait, setWait] = useState(false)
-  const [name, setName] = useState("")
-  const [against, setAgainst] = useState("")
+  const [username, setUsername] = useState("")
 
   useEffect(() => {
-    const name = localStorage.getItem("name")
-    if(name) setName(name)
-    if(gameId){
+    const username = localStorage.getItem("username")
+    if(username) setUsername(username)
 
-      database.ref(`games/${gameId}`).once("value", (snapshot) => {
-        const game = snapshot.val()
-        setAgainst(game.player1)
-      })
-
-      database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
+    if(gameId) {
+      const turnWatcher = database.ref(`games/${gameId}/turn`)
+      turnWatcher.on("value", (snapshot) => {
         const turn = snapshot.val()
-        if(turn === name) setWait(false)
+        if(turn === username) setWait(false)
         else setWait(true)
-        console.log("name:",name, "turn:",turn, "wait:",wait);
       })
 
-      database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
-        const board = snapshot.val()
-        console.log(board);
-        if(board)
-          dispatch({ type: "POPULATE", board })
+      database.ref(`games/${gameId}`).on("value", (snapshot) => {
+        const { board } = snapshot.val()
+        if(board) dispatch({ type: "POPULATE", board })
       })
-
     }
     // eslint-disable-next-line 
   },[])
 
   useEffect(() => {
     if(frameworks.length > 0)
-      database.ref(`games/${gameId}`).update({ board: frameworks })
-  }, [frameworks])
-
-  const handleCheckPairs = (index) => {
-    setWait(true)
-    
-    setTimeout(() => {
-      dispatch({ type:"CHECK", index, open: openCard })
-      setOpenCard(null)
-      setWait(false)
-      database.ref(`games/${gameId}`).update({turn: name})
-    }, 600)
-  }
+      database.ref(`games/${gameId}`).update({ board: frameworks, turn: username })
+  }, [frameworks, gameId, username])
 
   return (
-    <BoardContext.Provider value={{ dispatch, openCard, setOpenCard, wait, gameId }}>
+    <BoardContext.Provider value={{ frameworks, dispatch, wait, setWait }}>
       <div className="board">
-        {frameworks.length && frameworks.map((framework) => {
+        {frameworks.length && frameworks.map((framework, index) => {
           return (
-            <Card key={framework.index} {...framework} check={handleCheckPairs}/>
+            <Card key={index} index={index} {...framework} />
           )
         })}
       </div>

@@ -6,13 +6,13 @@ import getFrameworks from '../selectors/framework'
 
 const Home = ({ history }) => {
   const [mdlOpen, setMdlOpen] = useState(false)
-  const [name, setName] = useState("")
+  const [username, setUsername] = useState("")
   
   const handleOnMultiplayerGame = () => {
-    database.ref("games").push({ player1:name, turn: name }).then((ref) => {
-      localStorage.setItem("name", name)
+    database.ref("games").push({ player1:username, turn: username }).then((ref) => {
+      localStorage.setItem("username", username)
       const frameworkNames = getFrameworks(12)
-      const board = frameworkNames.map((name, index) => ({ name, index, isOpen: false, isMatch: false }))
+      const board = frameworkNames.map((name) => ({ name, isOpen: false, isMatch: false }))
       database.ref(`games/${ref.key}`).update({ board })
       history.push(`/game/${ref.key}`)
     })
@@ -34,7 +34,7 @@ const Home = ({ history }) => {
         >
           <h3 className="modal__title">Your Name</h3>
           <div className="modal__body">
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <input value={username} onChange={(e) => setUsername(e.target.value)} />
             <button onClick={handleOnMultiplayerGame} className="button">Okay</button>
           </div>
         </Modal>

@@ -1,18 +1,22 @@
 import React, { useContext } from 'react'
 import BoardContext from '../context/board-context'
-import database from '../firebase/firebase'
 
-const Card = ({ index, name, isOpen, isMatch, check }) => {
+const Card = ({ index, name, isOpen, isMatch }) => {
 
-  const { dispatch, openCard, setOpenCard, wait, gameId } = useContext(BoardContext)
+  const { frameworks, dispatch, wait, setWait } = useContext(BoardContext)
   const handleCardClick = () => {
-    console.log(wait);
     if(wait || isOpen || isMatch) return
-    dispatch({ type:"OPEN", index })
-    database.ref(`games/${gameId}/board/${index}`).update({isOpen: true})
     
-    if(openCard !== null) check(index)
-    else  setOpenCard(index)
+    const openCard = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
+    dispatch({ type:"OPEN", index })
+    if(openCard > -1) {
+      setWait(true)
+
+      setTimeout(() => {
+        dispatch({ type:"CHECK", index, open: openCard })
+        setWait(false)
+      }, 600)
+    }
   }
 
   return (
