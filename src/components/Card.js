@@ -3,10 +3,10 @@ import BoardContext from '../context/board-context'
 
 const Card = ({ index, name, isOpen, isMatch }) => {
 
-  const { frameworks, dispatch, wait, setWait } = useContext(BoardContext)
+  const { frameworks, dispatch, wait, setWait, updateTurn } = useContext(BoardContext)
   const handleCardClick = () => {
     if(wait || isOpen || isMatch) return
-    
+
     const openCard = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
     dispatch({ type:"OPEN", index })
     if(openCard > -1) {
@@ -15,6 +15,7 @@ const Card = ({ index, name, isOpen, isMatch }) => {
       setTimeout(() => {
         dispatch({ type:"CHECK", index, open: openCard })
         setWait(false)
+        updateTurn();
       }, 600)
     }
   }

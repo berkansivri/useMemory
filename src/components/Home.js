@@ -9,11 +9,11 @@ const Home = ({ history }) => {
   const [username, setUsername] = useState("")
   
   const handleOnMultiplayerGame = () => {
-    database.ref("games").push({ player1:username, turn: username }).then((ref) => {
-      localStorage.setItem("username", username)
+    database.ref("games").push({ player1:username }).then((ref) => {
       const frameworkNames = getFrameworks(12)
       const board = frameworkNames.map((name) => ({ name, isOpen: false, isMatch: false }))
       database.ref(`games/${ref.key}`).update({ board })
+      localStorage.setItem("username", username)
       history.push(`/game/${ref.key}`)
     })
   }
