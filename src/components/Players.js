@@ -1,9 +1,10 @@
 import React, { useEffect, useContext } from 'react'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
+import { ListGroup, ListGroupItem, Button } from 'react-bootstrap'
 
 const Players = () => {
-  const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn } = useContext(GameContext)
+  const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, setShowInviteModal } = useContext(GameContext)
 
 
   useEffect(() => {
@@ -26,11 +27,14 @@ const Players = () => {
   return (
     <div>
       <p>Players</p>
-      <ul className="list-group">
+      <ListGroup>
         {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
-          <li className={"list-group-item" + (p.id === turn ? " active" : "")} key={p.id}>{p.username}</li>)
+          <ListGroupItem className={ "py-1" + (p.id === turn ? " active" : "")} key={p.id}>{p.username}</ListGroupItem>)
         }
-      </ul>
+      </ListGroup>
+      <span>
+        <Button style={{marginTop: "30px"}} size="sm" variant="info" onClick={() => setShowInviteModal(true)}>Show Invite Link</Button>
+      </span>
     </div>
   )
 }

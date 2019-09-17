@@ -53,7 +53,7 @@ const Board = () => {
       const winner = players.reduce((prev,curr) => (prev.point > curr.point) ? prev : curr)
       const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start new game?`)
       if(startNew) {
-        const board = getFrameworks(frameworks.length)
+        const board = getFrameworks(frameworks.length/2)
         dispatch({ type:"POPULATE", board })
       }
     }

@@ -17,7 +17,8 @@ const Game = ({ match, history }) => {
 
   useEffect(() => {
     localStorage.setItem("player", JSON.stringify(localPlayer))
-  }, [localPlayer])
+    database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ isOnline: true })
+  }, [localPlayer, gameId])
 
   useEffect(() => {
     if(history.location.state){ 
@@ -31,7 +32,7 @@ const Game = ({ match, history }) => {
   }
 
   return (
-    <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, setLocalPlayer}}>
+    <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, setLocalPlayer, setShowInviteModal}}>
       <Container>
         <Row className="justify-content-md-left">
           {
@@ -65,7 +66,7 @@ const Game = ({ match, history }) => {
             </Modal.Footer>
           </Modal>
           }
-          <Col xs={2} md={2}>
+          <Col xs={2} md={2} className="ml-0 pl-0">
             <Players />
           </Col>
           <Col xs={10} md={10}>
