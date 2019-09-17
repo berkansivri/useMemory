@@ -14,7 +14,7 @@ body {
     perspective: 1000px;
     margin-bottom: -15px;
     .card {
-      width: 15%;
+      width: 13%;
       user-select: none;
       height: 110px;
       padding: 10px;
@@ -68,55 +68,6 @@ body {
       }
     }
   }
-}
-
-.ReactModalPortal>div {
-  opacity: 0;
-}
-
-.ReactModalPortal .ReactModal__Overlay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 300ms easy-in-out;
-}
-
-.ReactModalPortal .ReactModal__Overlay--after-open {
-  opacity: 1;
-}
-
-
-.ReactModalPortal .ReactModal__Overlay--before-close {
-  opacity: 0;
-}
-
-.rmodal {
-  background: gray;
-  color: white;
-  max-width: 25rem;
-  outline: none;
-  padding: 3.2rem;
-  text-align: center;
-}
-
-.rmodal__title {
-  margin: 0 0 3.2rem 0;
-}
-
-.mrodal__body {
-  font-size: 2rem;
-  font-weight: 300;
-  margin: 0 0 3.2rem 0;
-  word-break: break-all;
-}
-
-.button {
-  background: purple;
-  border: none;
-  color: white;
-  font-weight: 500;
-  padding: 1.6rem;
-  margin-left: 0;
 }
 
 @keyframes selected {

@@ -21,8 +21,11 @@ const Board = () => {
   }, [])
 
   useEffect(() => {
-    if(frameworks.length > 0)
+    if(frameworks.length > 0) {
       database.ref(`games/${gameId}`).update({ board: frameworks })
+      handleCheckWinner()
+    }
+    // eslint-disable-next-line
   }, [frameworks, gameId])
 
   const handleCardClick = (index) => {
@@ -39,7 +42,6 @@ const Board = () => {
         } else {
           dispatch({ type:"CLOSE", index, open })
         }
-        handleCheckWinner()
         setWait(false)
         nextTurn();
       }, 600)
@@ -47,11 +49,11 @@ const Board = () => {
   }
 
   const handleCheckWinner = () => {
-    if(frameworks.every(x=> x.isMatch === true)) {
+    if(frameworks.every(x => x.isMatch === true)) {
       const winner = players.reduce((prev,curr) => (prev.point > curr.point) ? prev : curr)
       const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start new game?`)
       if(startNew) {
-        const board = getFrameworks(12)
+        const board = getFrameworks(frameworks.length)
         dispatch({ type:"POPULATE", board })
       }
     }

@@ -15,7 +15,6 @@ const Players = () => {
     database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
       const turnId = snapshot.val()
       setTurn(turnId)
-      console.log("turn:",turnId, "local:", localPlayer.id);
       if(turnId === localPlayer.id) setWait(false)
       else setWait(true)
     })
@@ -25,11 +24,14 @@ const Players = () => {
   }, [])
 
   return (
-    <ul className="list-group">
-      {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
-        <li className={"list-group-item" + (p.id === turn ? " active" : "")} key={p.id}>{p.username}</li>)
-      }
-    </ul>
+    <div>
+      <p>Players</p>
+      <ul className="list-group">
+        {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
+          <li className={"list-group-item" + (p.id === turn ? " active" : "")} key={p.id}>{p.username}</li>)
+        }
+      </ul>
+    </div>
   )
 }
 
