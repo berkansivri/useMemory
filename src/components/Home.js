@@ -13,8 +13,8 @@ const Home = ({ history }) => {
       const frameworkNames = getFrameworks(12)
       const board = frameworkNames.map((name) => ({ name, isOpen: false, isMatch: false }))
       database.ref(`games/${ref.key}`).update({ board })
-      database.ref(`games/${ref.key}/players`).push({ username, isOnline: true }).then((ref) => {
-        localStorage.setItem("player", JSON.stringify({ id:ref.key, username }))
+      database.ref(`games/${ref.key}/players`).push({ username, isOnline: true }).then((playerRef) => {
+        localStorage.setItem("player", JSON.stringify({ id:playerRef.key, username }))
         history.push(`/game/${ref.key}`)
       })
     })
@@ -31,11 +31,11 @@ const Home = ({ history }) => {
           isOpen={mdlOpen}
           ariaHideApp={false}
           closeTimeoutMS={300}
-          className="modal"
+          className="rmodal"
           shouldCloseOnEsc={true}
         >
-          <h3 className="modal__title">Your Name</h3>
-          <div className="modal__body">
+          <h3 className="rmodal__title">Your Name</h3>
+          <div className="rmodal__body">
             <input value={username} onChange={(e) => setUsername(e.target.value)} />
             <button onClick={handleOnMultiplayerGame} className="button">Okay</button>
           </div>

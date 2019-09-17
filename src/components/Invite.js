@@ -8,8 +8,9 @@ const Invite = ({ match, history }) => {
 
   const handleJoin = () => {
     const gameId = match.params.id
-    localStorage.setItem("username", username)
-    database.ref(`games/${gameId}/users`).push({ username, isOnline: true })
+    database.ref(`games/${gameId}/players`).push({ username, isOnline: true }).then((ref) => {
+      localStorage.setItem("player", JSON.stringify({ id:ref.key, username }))
+    })
     history.push(`/game/${gameId}`)
   }
   return (
@@ -18,11 +19,11 @@ const Invite = ({ match, history }) => {
           isOpen={mdlOpen}
           ariaHideApp={false}
           closeTimeoutMS={300}
-          className="modal"
+          className="rmodal"
           shouldCloseOnEsc={true}
         >
-          <h3 className="modal__title">Your Name</h3>
-          <div className="modal__body">
+          <h3 className="rmodal__title">Your Name</h3>
+          <div className="rmodal__body">
             <input value={username} onChange={(e) => setUsername(e.target.value)} />
             <button onClick={handleJoin} className="button">Join</button>
           </div>

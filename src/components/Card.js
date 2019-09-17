@@ -1,23 +1,14 @@
 import React, { useContext } from 'react'
-import BoardContext from '../context/board-context'
+import GameContext from '../context/game-context'
 
-const Card = ({ index, name, isOpen, isMatch }) => {
+const Card = ({ name, isOpen, isMatch, cardClick }) => {
 
-  const { frameworks, dispatch, wait, setWait, updateTurn } = useContext(BoardContext)
+  const { wait } = useContext(GameContext)
+
   const handleCardClick = () => {
     if(wait || isOpen || isMatch) return
 
-    const openCard = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
-    dispatch({ type:"OPEN", index })
-    if(openCard > -1) {
-      setWait(true)
-
-      setTimeout(() => {
-        dispatch({ type:"CHECK", index, open: openCard })
-        setWait(false)
-        updateTurn();
-      }, 600)
-    }
+    cardClick()
   }
 
   return (
