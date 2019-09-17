@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Board from './Board'
 import GameContext from '../context/game-context'
 import Players from './Players'
@@ -9,7 +9,11 @@ const Game = ({ match }) => {
   const [turn, setTurn] = useState("")
   const [wait, setWait] = useState(false)
   const [players, setPlayers] = useState([]) 
-  const localPlayer = JSON.parse(localStorage.getItem("player"))
+  const [localPlayer, setLocalPlayer] = useState(JSON.parse(localStorage.getItem("player")))
+
+  useEffect(() => {
+    localStorage.setItem("player", JSON.stringify(localPlayer))
+  }, [localPlayer])
 
   const nextTurn = () => {
     const nextTurnIndex = (players.findIndex((user) => user.id === localPlayer.id) + 1) % players.length
@@ -17,7 +21,7 @@ const Game = ({ match }) => {
   }
 
   return (
-    <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players}}>
+    <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, setLocalPlayer}}>
       <div className="container">
         <div className="row">
           <div className="col-3 align-self-start">

@@ -10,16 +10,17 @@ const Home = ({ history }) => {
   
   const handleOnMultiplayerGame = () => {
     database.ref("games").push().then((ref) => {
-      const frameworkNames = getFrameworks(12)
-      const board = frameworkNames.map((name) => ({ name, isOpen: false, isMatch: false }))
+      const board = getFrameworks(12)
       database.ref(`games/${ref.key}`).update({ board })
-      database.ref(`games/${ref.key}/players`).push({ username, isOnline: true }).then((playerRef) => {
-        localStorage.setItem("player", JSON.stringify({ id:playerRef.key, username }))
-        history.push(`/game/${ref.key}`)
+      database.ref(`games/${ref.key}/players`).push({ username, isOnline: true, point: 0 }).then((playerRef) => {
+        localStorage.setItem("player", JSON.stringify({ id:playerRef.key, username, point: 0 }))
+        database.ref(`games/${ref.key}`).update({ turn: playerRef.key }).then(() => {
+          history.push(`/game/${ref.key}`)
+        })
       })
     })
   }
-
+  
   return (
     <div>
       <div>

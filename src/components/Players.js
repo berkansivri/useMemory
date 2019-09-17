@@ -4,7 +4,8 @@ import GameContext from '../context/game-context'
 
 const Players = () => {
   const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn } = useContext(GameContext)
-  
+
+
   useEffect(() => {
     database.ref(`games/${gameId}/players`).on("value", (snapshot) => {
       const users = snapshot.val()
@@ -12,14 +13,14 @@ const Players = () => {
     })
 
     database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
-      console.log(gameId);
       const turnId = snapshot.val()
       setTurn(turnId)
+      console.log("turn:",turnId, "local:", localPlayer.id);
       if(turnId === localPlayer.id) setWait(false)
       else setWait(true)
     })
 
-    database.ref(`games/${gameId}/players/${localPlayer.id}`).onDisconnect({ isOnline: false })
+    database.ref(`games/${gameId}/players/${localPlayer.id}`).onDisconnect().update({ isOnline: false })
     // eslint-disable-next-line
   }, [])
 

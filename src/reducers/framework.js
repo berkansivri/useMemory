@@ -5,15 +5,13 @@ const frameworkReducer = (state, action) => {
     case "OPEN":
       state[action.index].isOpen = true 
       return [...state]
-    case "CHECK":
-      const { index, open } = action
-      if(state[index].name === state[open].name) {
-        state[index].isMatch = true
-        state[open].isMatch = true
-      } else {
-        state[index].isOpen = false
-        state[open].isOpen = false
-      }
+    case "CLOSE":
+      state[action.index].isOpen = false
+      state[action.open].isOpen = false
+      return [...state]
+    case "MATCH":
+      state[action.index].isMatch = true
+      state[action.open].isMatch = true
       return [...state]
     default:
       return state

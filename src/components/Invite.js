@@ -8,10 +8,10 @@ const Invite = ({ match, history }) => {
 
   const handleJoin = () => {
     const gameId = match.params.id
-    database.ref(`games/${gameId}/players`).push({ username, isOnline: true }).then((ref) => {
-      localStorage.setItem("player", JSON.stringify({ id:ref.key, username }))
+    database.ref(`games/${gameId}/players`).push({ username, isOnline: true, point: 0 }).then((ref) => {
+      localStorage.setItem("player", JSON.stringify({ id:ref.key, username, point: 0 }))
+      history.push(`/game/${gameId}`)
     })
-    history.push(`/game/${gameId}`)
   }
   return (
     <div>

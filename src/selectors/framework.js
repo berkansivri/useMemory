@@ -19,7 +19,7 @@ const getRandomFrameworks = (count = 12) => {
     [randomFrameworks[i], randomFrameworks[j]] = [randomFrameworks[j], randomFrameworks[i]]
   }
   
-  return randomFrameworks
+  return randomFrameworks.map((name) => ({ name, isOpen: false, isMatch: false }))
 }
 
 export { getRandomFrameworks as default }
