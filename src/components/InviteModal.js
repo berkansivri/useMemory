@@ -11,9 +11,9 @@ export const InviteModal = () => {
   const target = useRef(null)
 
   useState(() => {
-    return fetch(`https://cutt.ly/api/api.php?key=${process.env.REACT_APP_CUTTLY_API_KEY}&short=${window.location.host}/${gameId}`)
-      .then((res) => res.json())
+    return fetch(`https://cutt.ly/api/api.php?key=${process.env.REACT_APP_CUTTLY_API_KEY}&short=${window.location.host}/${gameId}`).then((res) => res.json())
       .then((json) => setInviteUrl(json.url.shortLink))
+      .catch(() => setInviteUrl(window.location.host + "/" + gameId))
   }, [])
 
   return (
