@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
-import { ListGroup, ListGroupItem, Button } from 'react-bootstrap'
+import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 
 const Players = () => {
   const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn } = useContext(GameContext)
@@ -38,19 +38,31 @@ const Players = () => {
     return () => clearInterval(interval);
   }, [wait, timer, nextTurn])
 
+  const countdown = (player) => {
+    if(player.id === turn) {
+      return (
+        <Badge variant="dark" pill className="float-right" style={{fontSize:"90%"}}>{timer}</Badge>
+      )
+    }
+  }
+
   return (
-    <div>
-      <p>Players</p>
-      <ListGroup>
-        {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
-          <ListGroupItem className={ "py-1" + (p.id === turn ? " active" : "")} key={p.id}>{p.username} 
-          {p.id === turn ? ` (${timer})` : ''}</ListGroupItem>)
-        }
-      </ListGroup>
-      <span>
-        <Button style={{marginTop: "30px"}} size="sm" variant="info" onClick={() => setShowInviteModal(true)}>Show Invite Link</Button>
-      </span>
-    </div>
+    <Card border="info">
+      <Card.Header className="p-2">Players</Card.Header>
+      <Card.Body className="p-0">
+        <ListGroup variant="flush">
+          {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
+            <ListGroupItem variant="dark" style={{fontSize:"13px"}} className={"d-inline px-1 py-1" + (p.id === turn ? " active" : "")} key={p.id}>
+              {p.username} 
+              {countdown(p)}
+            </ListGroupItem>)
+          }
+        </ListGroup>
+      </Card.Body>
+      <Card.Footer className="p-1 text-center">
+          <Button style={{fontSize:"13px"}} className="p-1" size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
+      </Card.Footer>
+    </Card>
   )
 }
 

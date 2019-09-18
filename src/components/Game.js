@@ -33,8 +33,8 @@ const Game = ({ match, history }) => {
 
   return (
     <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, setLocalPlayer, setShowInviteModal}}>
-      <Container>
-        <Row className="justify-content-md-left">
+      <Container fluid>
+        <Row className="justify-content-around">
           {
             <Modal show={showInviteModal} onHide={() => setShowInviteModal(false)}>
             <Modal.Header closeButton>
@@ -62,14 +62,14 @@ const Game = ({ match, history }) => {
 
             <Modal.Footer>
               <div>Share this link to invite your opponents to game</div>
-              <Button className="btn btn-success" variant="secondary" onClick={() => setShowInviteModal(false)}>Ok</Button>
+              <Button variant="secondary" onClick={() => setShowInviteModal(false)}>Ok</Button>
             </Modal.Footer>
           </Modal>
           }
-          <Col xs={2} md={2} className="ml-0 pl-0">
+          <Col xs={3} sm={3} md={2} xl={2} className="my-0 px-0 py-0">
             <Players />
           </Col>
-          <Col xs={10} md={10}>
+          <Col xs={9} sm={9} md={10} xl={9} className="pl-2 pr-0">
             <Board />
           </Col>
         </Row>

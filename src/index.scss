@@ -4,7 +4,7 @@ body {
 }
 
 #root {
-  padding:35px;
+  padding: 30px 3px 0 0;
   margin: 20px auto;
   border-radius: 10px;
   .board {
@@ -52,6 +52,8 @@ body {
         img {
           vertical-align: middle;
           width: 70%;
+          max-height: 90%;
+          height: auto;
         }
       }
       &.opened {
