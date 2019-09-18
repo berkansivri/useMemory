@@ -5,17 +5,17 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 
 const Home = ({ match, history }) => {
   const [username, setUsername] = useState("")
-  const [difficulty, setDifficulty] = useState("")
+  const [difficulty, setDifficulty] = useState("easy")
   
   const handleSubmit = (e) => {
     e.preventDefault()
     if(username.length === 0) return
     
-    let boxCount = 12
+    let boxCount = 14
     if(!match.params.id) {
       database.ref("games").push().then((ref) => {
         switch (difficulty) {
-          case "easy": boxCount = 12
+          case "easy": boxCount = 14
             break;
           case "medium": boxCount = 21
             break;
