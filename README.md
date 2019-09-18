@@ -10,6 +10,10 @@
     <br />
     <a target="_blank" href="https://react-online-memory-game.herokuapp.com/"><b>--- Live Server ---</b></a>
   </p>
+  <br />
+  <p align="center">
+    ![](useMemory.gif)
+  </p>
 </p>
 <hr />
 
