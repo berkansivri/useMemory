@@ -4,8 +4,10 @@ import GameContext from '../context/game-context'
 import Players from './Players'
 import database from '../firebase/firebase'
 import { Modal, Button, Form, InputGroup, Overlay, Tooltip, Row, Col, Container } from 'react-bootstrap'
+import ClipboardJS from 'clipboard'
 
 const Game = ({ match, history }) => {
+  new ClipboardJS("#btnClipboard")
   const gameId = match.params.id
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showCopyTooltip, setShowCopyTooltip] = useState(false)
@@ -43,7 +45,7 @@ const Game = ({ match, history }) => {
 
             <Modal.Body>
               <InputGroup>
-              <Form.Control ref={target} type="text" value={window.location.host + "/" + gameId} disabled />
+              <Form.Control ref={target} id="inviteLink" type="text" value={window.location.host + "/" + gameId} readOnly style={{backgroundColor:"lightgray"}} />
               <Overlay target={target.current} show={showCopyTooltip} placement="top">
                 {props => (
                   <Tooltip id="overlay-example" {...props}>
@@ -51,10 +53,7 @@ const Game = ({ match, history }) => {
                   </Tooltip>
                 )}
               </Overlay>
-              <InputGroup.Append  onClick={() => {
-                navigator.clipboard.writeText(window.location.host + "/" + gameId)
-                setShowCopyTooltip(true)
-              }}>
+              <InputGroup.Append id="btnClipboard" data-clipboard-target="#inviteLink" onClick={() => setShowCopyTooltip(true)}>
                 <InputGroup style={{cursor:"pointer"}} className="btn btn-primary" id="inputGroupPrepend">Copy</InputGroup>
               </InputGroup.Append>
             </InputGroup>
@@ -68,7 +67,7 @@ const Game = ({ match, history }) => {
           }
           <Col xs={3} sm={3} md={2} xl={2} className="my-0 px-0 py-0">
             <Players />
-          </Col>
+          </Col>""
           <Col xs={9} sm={9} md={10} xl={9} className="pl-2 pr-0">
             <Board />
           </Col>
