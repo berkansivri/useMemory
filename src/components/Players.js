@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
 import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
+import useInterval from '../hooks/useInterval'
 
 const Players = () => {
   const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn } = useContext(GameContext)
@@ -9,7 +10,8 @@ const Players = () => {
   
   useEffect(() => {
     database.ref(`games/${gameId}/players`).on("value", (snapshot) => {
-      const users = Object.entries(snapshot.val()).map(x=> ({ id: x[0], ...x[1] }))
+      const val = snapshot.val()
+      const users = Object.entries(val).map(x=> ({ id: x[0], ...x[1] }))
       setPlayers(users)
     })
 
@@ -25,18 +27,26 @@ const Players = () => {
     // eslint-disable-next-line
   }, [])
 
-  useEffect(() => {
-    let interval = null
-    if(timer > 0){
-      interval = setInterval(() => {
-        setTimer(timer - 1)
-      }, 1000)
-    } else if(!wait){
-      clearInterval(interval)
-      nextTurn()
-    }
-    return () => clearInterval(interval);
-  }, [wait, timer, nextTurn])
+  useInterval(() => {
+    console.log("timer interval");
+    if(timer > 0)
+      setTimer(timer - 1)
+    else if(!wait) nextTurn()
+  }, 1000)
+
+  // useEffect(() => {
+  //   console.log("timer effect");
+  //   let interval = null
+  //   if(timer > 0){
+  //     interval = setInterval(() => {
+  //       setTimer(timer - 1)
+  //     }, 1000)
+  //   } else if(!wait) {
+  //     clearInterval(interval)
+  //     nextTurn()
+  //   }
+  //   return () => clearInterval(interval);
+  // }, [wait, timer, nextTurn])
 
   const countdown = (player) => {
     if(player.id === turn) {
@@ -53,7 +63,8 @@ const Players = () => {
         <ListGroup variant="flush">
           {players.length > 0 && players.filter(x=> x.isOnline).map(p => 
             <ListGroupItem variant="dark" style={{fontSize:"13px"}} className={"d-inline px-1 py-1" + (p.id === turn ? " active" : "")} key={p.id}>
-              {p.username} 
+              <Badge variant="success" pill className="float-left" style={{fontSize:"90%"}}>{p.point}</Badge>
+              {p.username}
               {countdown(p)}
             </ListGroupItem>)
           }

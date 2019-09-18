@@ -8,7 +8,8 @@ import getFrameworks from '../selectors/framework'
 const Board = () => {
   const [frameworks, dispatch] = useReducer(frameworkReducer, [])
   const { setWait, nextTurn, gameId, players, localPlayer, setLocalPlayer } = useContext(GameContext)
-
+  const audio = new Audio()
+  
   useEffect(() => {
 
     if(gameId) {
@@ -22,23 +23,33 @@ const Board = () => {
 
   useEffect(() => {
     if(frameworks.length > 0) {
-      database.ref(`games/${gameId}`).update({ board: frameworks })
-      handleCheckWinner()
+      database.ref(`games/${gameId}`).update({ board: frameworks }).then(() => {
+        handleCheckWinner()
+      })
     }
     // eslint-disable-next-line
   }, [frameworks, gameId])
 
   const handleCardClick = (index) => {
     const open = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
+    audio.src = process.env.PUBLIC_URL + "/open.wav"
+    audio.play()
     dispatch({ type:"OPEN", index })
-    
+    setWait(true)
+    setTimeout(() => {
+      setWait(false)
+    },600)
     if(open > -1) {
       setWait(true)
       setTimeout(() => {
         if(frameworks[index].name === frameworks[open].name) {
+          audio.src = process.env.PUBLIC_URL + "/match.mp3"
+          audio.play()
+
           dispatch({ type:"MATCH", index, open })
-          database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ point: ++localPlayer.point })
-          setLocalPlayer({ ...localPlayer })
+          database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ point: ++localPlayer.point }).then(() => {
+            setLocalPlayer({ ...localPlayer })
+          })
         } else {
           dispatch({ type:"CLOSE", index, open })
         }
@@ -50,6 +61,8 @@ const Board = () => {
 
   const handleCheckWinner = () => {
     if(frameworks.every(x => x.isMatch === true)) {
+      audio.src = process.env.PUBLIC_URL + "/winner.flac"
+      audio.play()
       const winner = players.reduce((prev,curr) => (prev.point > curr.point) ? prev : curr)
       const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start new game?`)
       if(startNew) {
