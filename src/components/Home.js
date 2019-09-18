@@ -70,7 +70,7 @@ const Home = ({ match, history }) => {
 
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Control type="text" placeholder="Name" onChange={(e) => setUsername(e.target.value)}></Form.Control>
+          <Form.Control type="text" placeholder="Name" onChange={(e) => setUsername(e.target.value.substring(0,10))}></Form.Control>
           {selectDifficulty()}
         </Form>
       </Modal.Body>
