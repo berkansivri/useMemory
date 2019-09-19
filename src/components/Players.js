@@ -22,31 +22,21 @@ const Players = () => {
       if(turnId === localPlayer.id) setWait(false)
       else setWait(true)
     })
-
+    database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ isOnline: true })
     database.ref(`games/${gameId}/players/${localPlayer.id}`).onDisconnect().update({ isOnline: false })
     // eslint-disable-next-line
   }, [])
 
+  useEffect(() => {
+    localStorage.setItem("player", JSON.stringify(localPlayer))
+  }, [localPlayer])
+
+
   useInterval(() => {
-    console.log("timer interval");
-    if(timer > 0)
-      setTimer(timer - 1)
-    else if(!wait) nextTurn()
+    if(timer > 0) setTimer(timer - 1)
+    else if(!wait && players.length > 1) nextTurn()
   }, 1000)
 
-  // useEffect(() => {
-  //   console.log("timer effect");
-  //   let interval = null
-  //   if(timer > 0){
-  //     interval = setInterval(() => {
-  //       setTimer(timer - 1)
-  //     }, 1000)
-  //   } else if(!wait) {
-  //     clearInterval(interval)
-  //     nextTurn()
-  //   }
-  //   return () => clearInterval(interval);
-  // }, [wait, timer, nextTurn])
 
   const countdown = (player) => {
     if(player.id === turn) {

@@ -7,11 +7,10 @@ import getFrameworks from '../selectors/framework'
 
 const Board = () => {
   const [frameworks, dispatch] = useReducer(frameworkReducer, [])
-  const { setWait, nextTurn, gameId, players, localPlayer, setLocalPlayer } = useContext(GameContext)
+  const { setWait, nextTurn, gameId, players, localPlayer, updateLocalPlayer } = useContext(GameContext)
   const audio = new Audio()
   
   useEffect(() => {
-
     if(gameId) {
       database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
         const board = snapshot.val()
@@ -35,10 +34,6 @@ const Board = () => {
     audio.src = process.env.PUBLIC_URL + "/open.wav"
     audio.play()
     dispatch({ type:"OPEN", index })
-    setWait(true)
-    setTimeout(() => {
-      setWait(false)
-    },600)
     if(open > -1) {
       setWait(true)
       setTimeout(() => {
@@ -47,14 +42,13 @@ const Board = () => {
           audio.play()
 
           dispatch({ type:"MATCH", index, open })
-          database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ point: ++localPlayer.point }).then(() => {
-            setLocalPlayer({ ...localPlayer })
-          })
+          updateLocalPlayer({ point: ++localPlayer.point })
+          setWait(false)
         } else {
           dispatch({ type:"CLOSE", index, open })
+          if(players.length > 1) nextTurn();
+          else setWait(false)
         }
-        setWait(false)
-        nextTurn();
       }, 600)
     }
   }
@@ -64,7 +58,7 @@ const Board = () => {
       audio.src = process.env.PUBLIC_URL + "/winner.flac"
       audio.play()
       const winner = players.reduce((prev,curr) => (prev.point > curr.point) ? prev : curr)
-      const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start new game?`)
+      const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start a new game?`)
       if(startNew) {
         const board = getFrameworks(frameworks.length/2)
         dispatch({ type:"POPULATE", board })

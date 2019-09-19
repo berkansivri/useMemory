@@ -7,7 +7,6 @@ const Card = ({ name, isOpen, isMatch, cardClick }) => {
 
   const handleCardClick = () => {
     if(wait || isOpen || isMatch) return
-
     cardClick()
   }
 
