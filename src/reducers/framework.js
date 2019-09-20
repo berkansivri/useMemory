@@ -7,7 +7,7 @@ const frameworkReducer = (state, action) => {
       return [...state]
     case "CLOSE":
       state[action.index].isOpen = false
-      state[action.open].isOpen = false
+      if(action.open !== undefined) state[action.open].isOpen = false
       return [...state]
     case "MATCH":
       state[action.index].isMatch = true

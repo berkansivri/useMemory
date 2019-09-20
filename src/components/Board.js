@@ -11,14 +11,11 @@ const Board = () => {
   const audio = new Audio()
   
   useEffect(() => {
-    if(gameId) {
-      database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
-        const board = snapshot.val()
-        if(board) dispatch({ type: "POPULATE", board })
-      })
-    }
-    // eslint-disable-next-line
-  }, [])
+    database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
+      dispatch({ type: "POPULATE", board: snapshot.val() })
+      // console.log(snapshot.val().filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name));
+    })
+  }, [gameId])
 
   useEffect(() => {
     if(frameworks.length > 0) {
@@ -37,19 +34,22 @@ const Board = () => {
     if(open > -1) {
       setWait(true)
       setTimeout(() => {
-        if(frameworks[index].name === frameworks[open].name) {
-          audio.src = process.env.PUBLIC_URL + "/match.mp3"
-          audio.play()
-
-          dispatch({ type:"MATCH", index, open })
-          updateLocalPlayer({ point: ++localPlayer.point })
-          setWait(false)
-        } else {
-          dispatch({ type:"CLOSE", index, open })
-          if(players.length > 1) nextTurn();
-          else setWait(false)
-        }
+        handleCheckMatch(index, open)
       }, 600)
+    }
+  }
+  
+  const handleCheckMatch = (index, open) => {
+    if(frameworks[index].name === frameworks[open].name) {
+      audio.src = process.env.PUBLIC_URL + "/match.mp3"
+      audio.play()
+      dispatch({ type:"MATCH", index, open })
+      updateLocalPlayer({ point: ++localPlayer.point })
+      setWait(false)
+    } else {
+      dispatch({ type:"CLOSE", index, open })
+      if(players.length > 1) nextTurn();
+      else setWait(false)
     }
   }
 

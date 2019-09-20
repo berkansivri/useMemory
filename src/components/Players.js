@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useReducer } from 'react'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
 import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
+import frameworkReducer from '../reducers/framework'
 
 const Players = () => {
+  const [frameworks, dispatch] = useReducer(frameworkReducer, [])
   const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn } = useContext(GameContext)
   const [timer, setTimer] = useState(15)
   
@@ -34,8 +36,16 @@ const Players = () => {
 
   useInterval(() => {
     if(timer > 0) setTimer(timer - 1)
-    else if(!wait && players.length > 1) nextTurn()
+    else if(!wait && players.length > 1) {
+      closeOpenCards()
+      nextTurn()
+    }
   }, 1000)
+
+  const closeOpenCards = () => {
+    const index = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
+    dispatch({ type:"CLOSE", index })
+  }
 
 
   const countdown = (player) => {
