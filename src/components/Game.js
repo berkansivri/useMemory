@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useReducer } from 'react'
 import Board from './Board'
 import GameContext from '../context/game-context'
 import Players from './Players'
 import database from '../firebase/firebase'
 import { Row, Col, Container } from 'react-bootstrap'
 import InviteModal from './InviteModal'
+import frameworkReducer from '../reducers/framework'
 
 const Game = ({ match, history }) => {
   
@@ -14,7 +15,8 @@ const Game = ({ match, history }) => {
   const [showInviteModal, setShowInviteModal] = useState(true)
   const [players, setPlayers] = useState([])
   const [localPlayer, setLocalPlayer] = useState(JSON.parse(localStorage.getItem("player")))
-
+  const [frameworks, dispatch] = useReducer(frameworkReducer, [])
+  
   const updateLocalPlayer = (props) => {
     database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ ...props }).then(() => {
       setLocalPlayer({ ...localPlayer })
@@ -27,7 +29,7 @@ const Game = ({ match, history }) => {
   }
 
   return (
-    <GameContext.Provider value={{gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
+    <GameContext.Provider value={{frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
       <Container fluid>
         <Row className="justify-content-around">
           {history.location.state && <InviteModal />}

@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useContext, useReducer } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
 import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
-import frameworkReducer from '../reducers/framework'
 
 const Players = () => {
-  const [frameworks, dispatch] = useReducer(frameworkReducer, [])
-  const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn } = useContext(GameContext)
+  const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
   const [timer, setTimer] = useState(15)
   
   useEffect(() => {
@@ -20,7 +18,7 @@ const Players = () => {
     database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
       const turnId = snapshot.val()
       setTurn(turnId)
-      setTimer(15)
+      setTimer(5)
       if(turnId === localPlayer.id) setWait(false)
       else setWait(true)
     })
@@ -34,17 +32,17 @@ const Players = () => {
   }, [localPlayer])
 
 
-  useInterval(() => {
+  useInterval(async () => {
     if(timer > 0) setTimer(timer - 1)
     else if(!wait && players.length > 1) {
-      closeOpenCards()
+      await closeOpenCards()
       nextTurn()
     }
   }, 1000)
 
   const closeOpenCards = () => {
     const index = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
-    dispatch({ type:"CLOSE", index })
+    if(index !== -1) return database.ref(`games/${gameId}/board/${index}`).update({ isOpen: false })
   }
 
 

@@ -1,28 +1,28 @@
-import React, {  useReducer, useEffect, useContext } from 'react'
+import React, {  useEffect, useContext } from 'react'
 import Card from './Card'
-import frameworkReducer from '../reducers/framework'
 import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
 import getFrameworks from '../selectors/framework'
 
 const Board = () => {
-  const [frameworks, dispatch] = useReducer(frameworkReducer, [])
-  const { setWait, nextTurn, gameId, players, localPlayer, updateLocalPlayer } = useContext(GameContext)
+  const { setWait, nextTurn, gameId, players, localPlayer, updateLocalPlayer, frameworks, dispatch } = useContext(GameContext)
   const audio = new Audio()
   
   useEffect(() => {
     database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
       dispatch({ type: "POPULATE", board: snapshot.val() })
-      // console.log(snapshot.val().filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name));
+      console.log(snapshot.val().filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name));
     })
-  }, [gameId])
+  }, [gameId, dispatch])
 
   useEffect(() => {
-    if(frameworks.length > 0) {
-      database.ref(`games/${gameId}`).update({ board: frameworks }).then(() => {
+    async function updateFrameworks() {
+      if(frameworks.length > 0) {
+        await database.ref(`games/${gameId}`).update({ board: frameworks })
         handleCheckWinner()
-      })
+      }
     }
+    updateFrameworks()
     // eslint-disable-next-line
   }, [frameworks, gameId])
 
@@ -31,7 +31,7 @@ const Board = () => {
     audio.src = process.env.PUBLIC_URL + "/open.wav"
     audio.play()
     dispatch({ type:"OPEN", index })
-    if(open > -1) {
+    if(open !== -1)  {
       setWait(true)
       setTimeout(() => {
         handleCheckMatch(index, open)
