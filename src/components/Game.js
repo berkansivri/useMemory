@@ -25,7 +25,7 @@ const Game = ({ match, history }) => {
 
   const nextTurn = () => {
     const nextTurnIndex = (players.findIndex((user) => user.id === localPlayer.id) + 1) % players.length
-    database.ref(`games/${gameId}`).update({ turn: players[nextTurnIndex].id })
+    return database.ref(`games/${gameId}`).update({ turn: players[nextTurnIndex].id })
   }
 
   return (

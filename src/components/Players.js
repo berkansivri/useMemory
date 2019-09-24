@@ -36,7 +36,7 @@ const Players = () => {
     if(timer > 0) setTimer(timer - 1)
     else if(!wait && players.length > 1) {
       await closeOpenCards()
-      nextTurn()
+      await nextTurn()
     }
   }, 1000)
 

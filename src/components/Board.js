@@ -11,46 +11,55 @@ const Board = () => {
   useEffect(() => {
     database.ref(`games/${gameId}/board`).on("value", (snapshot) => {
       dispatch({ type: "POPULATE", board: snapshot.val() })
-      console.log(snapshot.val().filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name));
+      console.log(snapshot.val().filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name))
     })
   }, [gameId, dispatch])
 
-  useEffect(() => {
-    async function updateFrameworks() {
-      if(frameworks.length > 0) {
-        await database.ref(`games/${gameId}`).update({ board: frameworks })
-        handleCheckWinner()
-      }
-    }
-    updateFrameworks()
-    // eslint-disable-next-line
-  }, [frameworks, gameId])
+  // useEffect(() => {
+  //   async function updateFrameworks() {
+  //     if(frameworks.length > 0) {
+  //       console.log(frameworks.filter(x=> x.isOpen === true && x.isMatch === false).map(x=> x.name))
+  //       await database.ref(`games/${gameId}`).update({ board: frameworks })
+  //       handleCheckWinner()
+  //     }
+  //   }
+  //   updateFrameworks()
+  //   // eslint-disable-next-line
+  // }, [frameworks, gameId])
 
-  const handleCardClick = (index) => {
+  const handleCardClick = async (index) => {
     const open = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
     audio.src = process.env.PUBLIC_URL + "/open.wav"
     audio.play()
     dispatch({ type:"OPEN", index })
+    await database.ref(`games/${gameId}`).update({ board: frameworks })
     if(open !== -1)  {
       setWait(true)
-      setTimeout(() => {
-        handleCheckMatch(index, open)
-      }, 600)
+      await handleCheckMatch(index, open)
     }
   }
   
-  const handleCheckMatch = (index, open) => {
-    if(frameworks[index].name === frameworks[open].name) {
-      audio.src = process.env.PUBLIC_URL + "/match.mp3"
-      audio.play()
-      dispatch({ type:"MATCH", index, open })
-      updateLocalPlayer({ point: ++localPlayer.point })
-      setWait(false)
-    } else {
-      dispatch({ type:"CLOSE", index, open })
-      if(players.length > 1) nextTurn();
-      else setWait(false)
-    }
+  const handleCheckMatch = async (index, open) => {
+    return new Promise(async (resolve,reject) => {
+      if(frameworks[index].name === frameworks[open].name) {
+        audio.src = process.env.PUBLIC_URL + "/match.mp3"
+        audio.play()
+        dispatch({ type:"MATCH", index, open })
+        updateLocalPlayer({ point: ++localPlayer.point })
+        await database.ref(`games/${gameId}`).update({ board: frameworks })
+        setWait(false)
+        resolve()
+      } else {
+        dispatch({ type:"CLOSE", index, open })
+        await database.ref(`games/${gameId}`).update({ board: frameworks })
+        if(players.length > 1) await nextTurn();
+        else setWait(false)
+        resolve()
+      }
+      if(frameworks.filter(x => x.Match === true).length === frameworks.length){
+        handleCheckWinner()
+      }
+    })
   }
 
   const handleCheckWinner = () => {
