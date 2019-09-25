@@ -23,9 +23,15 @@ const Game = ({ match, history }) => {
     })
   }
 
-  const nextTurn = () => {
-    const nextTurnIndex = (players.findIndex((user) => user.id === localPlayer.id) + 1) % players.length
-    return database.ref(`games/${gameId}`).update({ turn: players[nextTurnIndex].id })
+  const nextTurn = (payload) => {
+    console.log(turn);
+    const playerArray = payload || players 
+    let nextTurnIndex = (playerArray.findIndex((user) => user.id === turn) + 1) % playerArray.length
+    while(!playerArray[nextTurnIndex].isOnline) {
+      nextTurnIndex = (nextTurnIndex+1) % playerArray.length
+    }
+    console.log(nextTurnIndex);
+    return database.ref(`games/${gameId}`).update({ turn: playerArray[nextTurnIndex].id })
   }
 
   return (

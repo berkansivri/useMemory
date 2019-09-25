@@ -5,23 +5,30 @@ import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
 
 const Players = () => {
-  const { localPlayer, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
+  const { localPlayer, dispatch, turn, gameId, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
   const [timer, setTimer] = useState(15)
   
   useEffect(() => {
+    let tempTurn = null
+    database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
+      const turnId = snapshot.val()
+      setTurn(turnId)
+      tempTurn = turnId
+      setTimer(10)
+      if(turnId === localPlayer.id) setWait(false)
+      else setWait(true)
+    })
+
     database.ref(`games/${gameId}/players`).on("value", (snapshot) => {
       const val = snapshot.val()
       const users = Object.entries(val).map(x=> ({ id: x[0], ...x[1] }))
       setPlayers(users)
+      console.log(tempTurn);
+      if(users.find(u => u.id === tempTurn).isOnline === false) {
+        nextTurn(users)
+      }
     })
-
-    database.ref(`games/${gameId}/turn`).on("value", (snapshot) => {
-      const turnId = snapshot.val()
-      setTurn(turnId)
-      setTimer(5)
-      if(turnId === localPlayer.id) setWait(false)
-      else setWait(true)
-    })
+    
     database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ isOnline: true })
     database.ref(`games/${gameId}/players/${localPlayer.id}`).onDisconnect().update({ isOnline: false })
     // eslint-disable-next-line
@@ -35,17 +42,17 @@ const Players = () => {
   useInterval(async () => {
     if(timer > 0) setTimer(timer - 1)
     else if(!wait && players.length > 1) {
-      await closeOpenCards()
       await nextTurn()
     }
   }, 1000)
 
-  const closeOpenCards = () => {
-    const index = frameworks.findIndex(x=> x.isOpen === true && x.isMatch === false)
-    if(index !== -1) return database.ref(`games/${gameId}/board/${index}`).update({ isOpen: false })
-  }
-
-
+  useEffect(() => {
+    // eslint-disable-next-line
+    const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
+    dispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
+    // eslint-disable-next-line
+  }, [turn])
+  
   const countdown = (player) => {
     if(player.id === turn) {
       return (
