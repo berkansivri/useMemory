@@ -1,14 +1,11 @@
 import React, {  useEffect, useContext } from 'react'
 import Card from './Card'
-import database from '../firebase/firebase'
 import GameContext from '../context/game-context'
 import getFrameworks from '../selectors/framework'
 
 const Board = () => {
-  const { wait, nextTurn, gameId, players, localPlayer, updateLocalPlayer, frameworks, dispatch } = useContext(GameContext)
+  const { wait, nextTurn, players, localPlayer, updateLocalPlayer, frameworks, dispatch, dbRef } = useContext(GameContext)
   const audio = new Audio()
-
-  const dbRef = database.ref(`games/${gameId}`)
   
   useEffect(() => {
     if(wait) {
@@ -39,7 +36,6 @@ const Board = () => {
     updateFrameworks()
     // eslint-disable-next-line
   }, [frameworks])
-
 
   const handleCardClick = async (index) => {
     //eslint-disable-next-line

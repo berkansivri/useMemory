@@ -16,26 +16,23 @@ const Game = ({ match, history }) => {
   const [players, setPlayers] = useState([])
   const [localPlayer, setLocalPlayer] = useState(JSON.parse(localStorage.getItem("player")))
   const [frameworks, dispatch] = useReducer(frameworkReducer, [])
+  const dbRef = database.ref(`games/${gameId}`)
   
   const updateLocalPlayer = (props) => {
-    database.ref(`games/${gameId}/players/${localPlayer.id}`).update({ ...props }).then(() => {
+    dbRef.child(`players/${localPlayer.id}`).update({ ...props }).then(() => {
       setLocalPlayer({ ...localPlayer })
     })
   }
 
-  const nextTurn = (payload) => {
-    console.log(turn);
-    const playerArray = payload || players 
-    let nextTurnIndex = (playerArray.findIndex((user) => user.id === turn) + 1) % playerArray.length
-    while(!playerArray[nextTurnIndex].isOnline) {
-      nextTurnIndex = (nextTurnIndex+1) % playerArray.length
+  const nextTurn = () => {
+    if(players.length > 1) {
+      let nextTurnIndex = (players.findIndex((user) => user.id === turn) + 1) % players.length
+      return dbRef.update({ turn: players[nextTurnIndex].id })
     }
-    console.log(nextTurnIndex);
-    return database.ref(`games/${gameId}`).update({ turn: playerArray[nextTurnIndex].id })
   }
 
   return (
-    <GameContext.Provider value={{frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
+    <GameContext.Provider value={{ dbRef, frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
       <Container fluid>
         <Row className="justify-content-around">
           {history.location.state && <InviteModal />}
