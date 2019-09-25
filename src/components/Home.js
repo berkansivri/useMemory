@@ -11,11 +11,11 @@ const Home = ({ match, history }) => {
     e.preventDefault()
     if(username.length === 0) return
     
-    let boxCount = 14
+    let boxCount = 3
     if(!match.params.id) {
       database.ref("games").push().then((ref) => {
         switch (difficulty) {
-          case "easy": boxCount = 14
+          case "easy": boxCount = 3
             break;
           case "medium": boxCount = 21
             break;

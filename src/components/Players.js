@@ -4,8 +4,8 @@ import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
 
 const Players = () => {
-  const { dbRef, localPlayer, dispatch, turn, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
-  const [timer, setTimer] = useState(15)
+  const { dbRef, localPlayer, fwDispatch, turn, setWait, pDispatch, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
+  const [timer, setTimer] = useState(10)
 
   useEffect(() => {
     let tempTurn = null
@@ -22,7 +22,8 @@ const Players = () => {
       const val = snapshot.val()
       // eslint-disable-next-line
       const users = Object.entries(val).reduce((a,u) => (u[1].isOnline && a.push({ id: u[0], ...u[1] }), a ), [])
-      setPlayers(users)
+      console.log("set players");
+      pDispatch({ type:"POPULATE", players: users })
       if(users.findIndex(u => u.id === tempTurn) === -1) {
         let turnIndex = (Object.keys(val).indexOf(tempTurn) + 1) % users.length
         dbRef.update({ turn: users[turnIndex].id })
@@ -49,7 +50,7 @@ const Players = () => {
   useEffect(() => {
     // eslint-disable-next-line
     const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
-    dispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
+    if(opens.length) fwDispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
     // eslint-disable-next-line
   }, [turn])
   
