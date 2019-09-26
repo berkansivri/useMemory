@@ -6,14 +6,15 @@ import useInterval from '../hooks/useInterval'
 const Players = () => {
   const { dbRef, localPlayer, dispatch, turn, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
   const [timer, setTimer] = useState(10)
-
+  
   useEffect(() => {
     let tempTurn = null
     dbRef.child("turn").on("value", (snapshot) => {
       const turnId = snapshot.val()
-      setTurn(turnId)
       tempTurn = turnId
+
       setTimer(10)
+      setTurn(turnId)
       if(turnId === localPlayer.id) setWait(false)
       else setWait(true)
     })
@@ -23,6 +24,7 @@ const Players = () => {
       // eslint-disable-next-line
       const users = Object.entries(val).reduce((a,u) => (u[1].isOnline && a.push({ id: u[0], ...u[1] }), a ), [])
       setPlayers(users)
+      if(wait) setTimer(10)
       if(users.findIndex(u => u.id === tempTurn) === -1) {
         let turnIndex = (Object.keys(val).indexOf(tempTurn) + 1) % users.length
         dbRef.update({ turn: users[turnIndex].id })
@@ -33,13 +35,14 @@ const Players = () => {
     dbRef.child(`players/${localPlayer.id}`).onDisconnect().update({ isOnline: false })
     // eslint-disable-next-line
   }, [])
-
+  
   useEffect(() => {
     localStorage.setItem("player", JSON.stringify(localPlayer))
   }, [localPlayer])
 
 
   useInterval(async () => {
+    console.log("use interval timer:", timer);
     if(timer > 1) setTimer(timer - 1)
     else if(!wait && players.length > 1) {
       await nextTurn()
@@ -47,6 +50,7 @@ const Players = () => {
   }, 1000)
 
   useEffect(() => {
+    console.log(timer);
     // eslint-disable-next-line
     const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
     if(opens.length) dispatch({ type:"CLOSE", index: opens[0], open: opens[1] })

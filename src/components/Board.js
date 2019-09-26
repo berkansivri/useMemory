@@ -31,9 +31,10 @@ const Board = () => {
       setTimeout(() => {
         const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start a new game?`)
         if(startNew) {
+          snapshot.ref.remove()
           dbRef.child("type").once("value", (snapshot) => {
-            const board = getFrameworks(snapshot.val())
             updateLocalPlayer({ point: 0 })
+            const board = getFrameworks(snapshot.val())
             nextTurn()
             dispatch({ type:"POPULATE", board })
           })
