@@ -34,8 +34,8 @@ const Board = () => {
           dbRef.child("type").once("value", (snapshot) => {
             const board = getFrameworks(snapshot.val())
             updateLocalPlayer({ point: 0 })
-            dispatch({ type:"POPULATE", board })
             nextTurn()
+            dispatch({ type:"POPULATE", board })
           })
         } else {
           dbRef.off()

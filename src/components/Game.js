@@ -6,6 +6,7 @@ import database from '../firebase/firebase'
 import { Row, Col, Container } from 'react-bootstrap'
 import InviteModal from './InviteModal'
 import frameworkReducer from '../reducers/framework'
+import NotFound from './NotFound'
 
 const Game = ({ match, history }) => {
   
@@ -30,22 +31,27 @@ const Game = ({ match, history }) => {
       return dbRef.update({ turn: players[nextTurnIndex].id })
     }
   }
-
-  return (
-    <GameContext.Provider value={{ dbRef, frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
-      <Container fluid>
-        <Row className="justify-content-around">
-          {history.location.state && <InviteModal />}
-          <Col xs={3} sm={3} md={2} xl={2} className="my-0 px-0 py-0">
-            <Players />
-          </Col>
-          <Col xs={9} sm={9} md={10} xl={9} className="pl-2 pr-0">
-            <Board />
-          </Col>
-        </Row>
-      </Container>
-    </GameContext.Provider>
-  )
+  if(frameworks) {
+    return (
+      <GameContext.Provider value={{ dbRef, frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
+        <Container fluid>
+          <Row className="justify-content-around">
+            {history.location.state && <InviteModal />}
+            <Col xs={3} sm={3} md={2} xl={2} className="my-0 px-0 py-0">
+              <Players />
+            </Col>
+            <Col xs={9} sm={9} md={10} xl={9} className="pl-2 pr-0">
+              <Board />
+            </Col>
+          </Row>
+        </Container>
+      </GameContext.Provider>
+    )
+  } else {
+    return (
+      <NotFound />
+    )
+  }
 }
 
 export { Game as default }

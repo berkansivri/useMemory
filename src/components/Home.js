@@ -1,21 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import database from '../firebase/firebase'
 import getFrameworks from '../selectors/framework'
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
+import NotFound from './NotFound'
 
 const Home = ({ match, history }) => {
   const [username, setUsername] = useState("")
   const [difficulty, setDifficulty] = useState("easy")
+  const gameId = match.params.id
+
+  useEffect(() => {
+    if(gameId) {
+      database.ref(`games`).child(gameId).once("value", (snapshot) => {
+        if(!snapshot.val()) {
+          history.push("404")
+        }
+      })
+    }
+  //eslint-disable-next-line
+  }, [])
   
   const handleSubmit = (e) => {
     e.preventDefault()
     if(username.length === 0) return
     
-    let boxCount = 1
+    let boxCount = 14
     if(!match.params.id) {
       database.ref("games").push().then((ref) => {
         switch (difficulty) {
-          case "easy": boxCount = 1
+          case "easy": boxCount = 14
             break;
           case "medium": boxCount = 21
             break;
@@ -34,7 +47,6 @@ const Home = ({ match, history }) => {
         })
       })
     } else {
-      const gameId = match.params.id
       database.ref(`games/${gameId}/players`).push({ username, isOnline: true, point: 0 }).then((ref) => {
         localStorage.setItem("player", JSON.stringify({ id:ref.key, username, point: 0 }))
         history.push(`/game/${gameId}`)
@@ -61,25 +73,30 @@ const Home = ({ match, history }) => {
       )
     }
   }
-
-  return (
-    <Modal.Dialog>
-      <Modal.Header className="justify-content-center">
-        <Modal.Title>Enter your name</Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Control type="text" placeholder="Name" onChange={(e) => setUsername(e.target.value.substring(0,10))}></Form.Control>
-          {selectDifficulty()}
-        </Form>
-      </Modal.Body>
-      
-      <Modal.Footer className="justify-content-center">
-        <Button type="submit" variant="primary" onClick={handleSubmit}>{match.params.id ? "Join Game" : "Create Board"}</Button>
-      </Modal.Footer>
-    </Modal.Dialog>
-  )
+  if(match.url !== "/404") {
+    return (
+      <Modal.Dialog>
+        <Modal.Header className="justify-content-center">
+          <Modal.Title>Enter your name</Modal.Title>
+        </Modal.Header>
+  
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Control type="text" placeholder="Name" onChange={(e) => setUsername(e.target.value.substring(0,10))}></Form.Control>
+            {selectDifficulty()}
+          </Form>
+        </Modal.Body>
+        
+        <Modal.Footer className="justify-content-center">
+          <Button type="submit" variant="primary" onClick={handleSubmit}>{match.params.id ? "Join Game" : "Create Board"}</Button>
+        </Modal.Footer>
+      </Modal.Dialog>
+    )
+  } else {
+    return (
+      <NotFound />
+    )
+  }
 }
 
 export { Home as default }
