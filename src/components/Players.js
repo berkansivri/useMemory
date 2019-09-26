@@ -4,7 +4,7 @@ import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
 
 const Players = () => {
-  const { dbRef, localPlayer, fwDispatch, turn, setWait, pDispatch, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
+  const { dbRef, localPlayer, dispatch, turn, setWait, setPlayers, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
   const [timer, setTimer] = useState(10)
 
   useEffect(() => {
@@ -22,8 +22,7 @@ const Players = () => {
       const val = snapshot.val()
       // eslint-disable-next-line
       const users = Object.entries(val).reduce((a,u) => (u[1].isOnline && a.push({ id: u[0], ...u[1] }), a ), [])
-      console.log("set players");
-      pDispatch({ type:"POPULATE", players: users })
+      setPlayers(users)
       if(users.findIndex(u => u.id === tempTurn) === -1) {
         let turnIndex = (Object.keys(val).indexOf(tempTurn) + 1) % users.length
         dbRef.update({ turn: users[turnIndex].id })
@@ -41,7 +40,7 @@ const Players = () => {
 
 
   useInterval(async () => {
-    if(timer > 0) setTimer(timer - 1)
+    if(timer > 1) setTimer(timer - 1)
     else if(!wait && players.length > 1) {
       await nextTurn()
     }
@@ -50,7 +49,7 @@ const Players = () => {
   useEffect(() => {
     // eslint-disable-next-line
     const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
-    if(opens.length) fwDispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
+    if(opens.length) dispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
     // eslint-disable-next-line
   }, [turn])
   

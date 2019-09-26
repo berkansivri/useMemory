@@ -11,11 +11,11 @@ const Home = ({ match, history }) => {
     e.preventDefault()
     if(username.length === 0) return
     
-    let boxCount = 3
+    let boxCount = 1
     if(!match.params.id) {
       database.ref("games").push().then((ref) => {
         switch (difficulty) {
-          case "easy": boxCount = 3
+          case "easy": boxCount = 1
             break;
           case "medium": boxCount = 21
             break;
@@ -25,10 +25,10 @@ const Home = ({ match, history }) => {
             break;
         }
         const board = getFrameworks(boxCount)
-        database.ref(`games/${ref.key}`).update({ board, type: difficulty })
+        database.ref(`games/${ref.key}`).update({ board, type: boxCount })
         database.ref(`games/${ref.key}/players`).push({ username, isOnline: true, point: 0 }).then((playerRef) => {
           localStorage.setItem("player", JSON.stringify({ id:playerRef.key, username, point: 0 }))
-          database.ref(`games/${ref.key}`).update({ turn: playerRef.key }).then(() => {
+          database.ref(`games/${ref.key}`).update({ turn: playerRef.key, winner: null }).then(() => {
             history.push(`/game/${ref.key}`, "owner")
           })
         })
