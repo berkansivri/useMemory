@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 import Board from './Board'
 import GameContext from '../context/game-context'
 import Players from './Players'
@@ -6,24 +6,27 @@ import database from '../firebase/firebase'
 import { Row, Col, Container } from 'react-bootstrap'
 import InviteModal from './InviteModal'
 import frameworkReducer from '../reducers/framework'
+import usePlayers from '../hooks/usePlayers'
+import useLocalPlayer from '../hooks/useLocalPlayer'
 import NotFound from './NotFound'
 
 const Game = ({ match, history }) => {
   
   const gameId = match.params.id
+  const dbRef = database.ref(`games/${gameId}`)
   const [turn, setTurn] = useState("")
   const [wait, setWait] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(true)
-  const [players, setPlayers] = useState([])
-  const [localPlayer, setLocalPlayer] = useState(JSON.parse(localStorage.getItem("player")))
-  const [frameworks, dispatch] = useReducer(frameworkReducer, [])
-  const dbRef = database.ref(`games/${gameId}`)
+  
+  const [frameworks, fwDispatch] = useReducer(frameworkReducer, [])
+  const { players } = usePlayers(dbRef)
+  const { localPlayer, setLocalPlayer } = useLocalPlayer(dbRef)
+  const [timer, setTimer] = useState(10)
 
-  const updateLocalPlayer = (props) => {
-    dbRef.child(`players/${localPlayer.id}`).update({ ...props }).then(() => {
-      setLocalPlayer({ ...localPlayer })
-    })
-  }
+  useEffect(() => {
+    if(!localPlayer && localPlayer.game !== gameId) history.push(`/${gameId}`)
+    //eslint-disable-next-line
+  }, [])
 
   const nextTurn = () => {
     if(players.length > 1) {
@@ -31,9 +34,10 @@ const Game = ({ match, history }) => {
       return dbRef.update({ turn: players[nextTurnIndex].id })
     }
   }
+
   if(frameworks) {
     return (
-      <GameContext.Provider value={{ dbRef, frameworks, dispatch, gameId, turn, setTurn, localPlayer, wait, setWait, setPlayers, nextTurn, players, updateLocalPlayer, showInviteModal, setShowInviteModal}}>
+      <GameContext.Provider value={{ dbRef, timer, setTimer, frameworks, fwDispatch, gameId, turn, setTurn, localPlayer, setLocalPlayer, wait, setWait, nextTurn, players, showInviteModal, setShowInviteModal}}>
         <Container fluid>
           <Row className="justify-content-around">
             {history.location.state && <InviteModal />}

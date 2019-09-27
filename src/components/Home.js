@@ -24,13 +24,13 @@ const Home = ({ match, history }) => {
     e.preventDefault()
     if(username.length === 0) return
     
-    let boxCount = 14
+    let boxCount = 12
     if(!match.params.id) {
       database.ref("games").push().then((ref) => {
         switch (difficulty) {
-          case "easy": boxCount = 14
+          case "easy": boxCount = 12
             break;
-          case "medium": boxCount = 21
+          case "medium": boxCount = 18
             break;
           case "hard": boxCount = 35
             break;
@@ -38,17 +38,17 @@ const Home = ({ match, history }) => {
             break;
         }
         const board = getFrameworks(boxCount)
-        database.ref(`games/${ref.key}`).update({ board, type: boxCount })
-        database.ref(`games/${ref.key}/players`).push({ username, isOnline: true, point: 0 }).then((playerRef) => {
-          localStorage.setItem("player", JSON.stringify({ id:playerRef.key, username, point: 0 }))
-          database.ref(`games/${ref.key}`).update({ turn: playerRef.key, winner: null }).then(() => {
+        database.ref(`games/${ref.key}`).update({ board, type: boxCount, winner: null })
+        database.ref(`games/${ref.key}/players`).push({ username, point: 0 }).then((playerRef) => {
+          localStorage.setItem("player", JSON.stringify({ game: ref.key, id:playerRef.key, username, point: 0 }))
+          // database.ref(`games/${ref.key}`).update({ turn: playerRef.key }).then(() => {
             history.push(`/game/${ref.key}`, "owner")
-          })
+          // })
         })
       })
     } else {
-      database.ref(`games/${gameId}/players`).push({ username, isOnline: true, point: 0 }).then((ref) => {
-        localStorage.setItem("player", JSON.stringify({ id:ref.key, username, point: 0 }))
+      database.ref(`games/${gameId}/players`).push({ username, point: 0 }).then((ref) => {
+        localStorage.setItem("player", JSON.stringify({ game: ref.key, id:ref.key, username, point: 0 }))
         history.push(`/game/${gameId}`)
       })
     }

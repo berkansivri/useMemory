@@ -4,14 +4,14 @@ import GameContext from '../context/game-context'
 import getFrameworks from '../selectors/framework'
 
 const Board = () => {
-  const { wait, nextTurn, players, localPlayer, updateLocalPlayer, frameworks, dispatch, dbRef } = useContext(GameContext)
+  const { wait, nextTurn, players, localPlayer, setLocalPlayer, frameworks, fwDispatch, dbRef } = useContext(GameContext)
   const audio = new Audio()
 
   useEffect(() => {
     if(wait) {
       dbRef.child("board").on("value", (snapshot) => {
         const board = snapshot.val()
-        dispatch({ type: "POPULATE", board })
+        fwDispatch({ type: "POPULATE", board })
       })
     } else {
       dbRef.child("board").off()
@@ -21,7 +21,7 @@ const Board = () => {
   
   useEffect(() => {
     dbRef.child("board").once("value", (snapshot) => {
-      dispatch({ type: "POPULATE", board: snapshot.val() })
+      fwDispatch({ type: "POPULATE", board: snapshot.val() })
     })
 
     dbRef.child("winner").on("child_added", (snapshot) => {
@@ -33,10 +33,10 @@ const Board = () => {
         if(startNew) {
           snapshot.ref.remove()
           dbRef.child("type").once("value", (snapshot) => {
-            updateLocalPlayer({ point: 0 })
+            setLocalPlayer({ ...localPlayer, point: 0 })
             const board = getFrameworks(snapshot.val())
             nextTurn()
-            dispatch({ type:"POPULATE", board })
+            fwDispatch({ type:"POPULATE", board })
           })
         } else {
           dbRef.off()
@@ -65,7 +65,7 @@ const Board = () => {
 
     audio.src = process.env.PUBLIC_URL + "/open.wav"
     audio.play()
-    dispatch({ type:"OPEN", index })
+    fwDispatch({ type:"OPEN", index })
     if(opens.length === 1)  {
       setTimeout(async () => await handleCheckMatch(index, opens[0]), 600)
     }
@@ -75,11 +75,11 @@ const Board = () => {
     if(frameworks[index].name === frameworks[open].name) {
       audio.src = process.env.PUBLIC_URL + "/match.mp3"
       audio.play()
-      dispatch({ type:"MATCH", index, open })
-      updateLocalPlayer({ point: ++localPlayer.point })
+      fwDispatch({ type:"MATCH", index, open })
+      setLocalPlayer({ ...localPlayer, point: ++localPlayer.point })
     } else {
       if(players.length > 1) await nextTurn()
-      else dispatch({ type:"CLOSE", index, open })
+      else fwDispatch({ type:"CLOSE", index, open })
     }
   }
 
