@@ -39,16 +39,14 @@ const Home = ({ match, history }) => {
         }
         const board = getFrameworks(boxCount)
         database.ref(`games/${ref.key}`).update({ board, type: boxCount, winner: null })
-        database.ref(`games/${ref.key}/players`).push({ username, point: 0 }).then((playerRef) => {
-          localStorage.setItem("player", JSON.stringify({ game: ref.key, id:playerRef.key, username, point: 0 }))
-          // database.ref(`games/${ref.key}`).update({ turn: playerRef.key }).then(() => {
+        database.ref(`games/${ref.key}/players`).push({ username, point: 0, isReady: false }).then((playerRef) => {
+          localStorage.setItem("player", JSON.stringify({ game: ref.key, id:playerRef.key, username, point: 0, isReady: true }))
             history.push(`/game/${ref.key}`, "owner")
-          // })
         })
       })
     } else {
-      database.ref(`games/${gameId}/players`).push({ username, point: 0 }).then((ref) => {
-        localStorage.setItem("player", JSON.stringify({ game: ref.key, id:ref.key, username, point: 0 }))
+      database.ref(`games/${gameId}/players`).push({ username, point: 0, isReady: false }).then((ref) => {
+        localStorage.setItem("player", JSON.stringify({ game: ref.key, id:ref.key, username, point: 0, isReady: false }))
         history.push(`/game/${gameId}`)
       })
     }

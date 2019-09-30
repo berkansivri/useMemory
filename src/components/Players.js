@@ -4,7 +4,7 @@ import { ListGroup, ListGroupItem, Button, Card, Badge } from 'react-bootstrap'
 import useInterval from '../hooks/useInterval'
 
 const Players = () => {
-  const { dbRef, localPlayer, timer, setTimer, fwDispatch, turn, setWait, players, setTurn, wait, setShowInviteModal, nextTurn, frameworks } = useContext(GameContext)
+  const { dbRef, localPlayer, timer, setTimer, setLocalPlayer, isCreator, turn, setWait, players, setTurn, setShowInviteModal, nextTurn } = useContext(GameContext)
   
   useEffect(() => {
     dbRef.child("turn").on("value", (snapshot) => {
@@ -16,32 +16,52 @@ const Players = () => {
         else setWait(true)
       }
     })
- 
     // eslint-disable-next-line
   }, [])
 
   useInterval(async () => {
     if(timer > 1) setTimer(timer - 1)
-    else if(!wait && players.length > 1) {
+    else if(timer !== null && players.length > 1) {
       await nextTurn()
     }
   }, 1000)
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
-    if(opens.length) fwDispatch({ type:"CLOSE", index: opens[0], open: opens[1] })
-    // eslint-disable-next-line
-  }, [turn])
-  
-  const handleStartGame = () => {
-    dbRef.update({ turn: localPlayer.id })
-  }
 
   const countdown = (player) => {
     if(player.id === turn) {
       return (
         <Badge variant="dark" pill className="float-right" style={{fontSize:"90%"}}>{timer}</Badge>
+      )
+    }
+  }
+
+  const readyState = (p) => {
+    if(!turn) {
+      return (
+        <Badge pill variant={p.isReady ? "primary" : "secondary"} style={{fontSize:"10px"}} className="float-right mt-1">Ready</Badge>
+      )
+    }
+  }
+
+  const ReadyStartButton = () => {
+    if(isCreator)
+    {
+      const everyoneReady = players && players.every((p) => p.isReady)
+      return (
+        <Button style={{fontSize:"13px"}} variant={everyoneReady ? "success" : "secondary"} size="sm" className="p-1 ml-2" 
+          disabled={!!turn}
+          onClick={() => {
+            if(everyoneReady) {
+              dbRef.update({ turn: localPlayer.id })
+            }
+          }} >Start</Button>
+      )
+    } else {
+      return (
+        <Button style={{fontSize:"13px"}} variant={localPlayer.isReady ? "success" : "secondary"} size="sm" className="p-1" 
+          disabled={!!turn}
+          onClick={() => {
+            setLocalPlayer({ ...localPlayer, isReady: !localPlayer.isReady })         
+          }} >I'm Ready</Button>
       )
     }
   }
@@ -55,16 +75,15 @@ const Players = () => {
             <ListGroupItem variant="dark" style={{fontSize:"13px"}} className={"d-inline px-1 py-1" + (p.id === turn ? " active" : "")} key={p.id}>
               <Badge variant="success" pill className="float-left" style={{fontSize:"90%"}}>{p.point}</Badge>
               {p.username}
+              {readyState(p)}
               {countdown(p)}
             </ListGroupItem>)
           }
         </ListGroup>
       </Card.Body>
       <Card.Footer className="p-1 text-center">
-          <Button style={{fontSize:"13px"}} className="p-1" size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
-          <Button style={{fontSize:"13px"}} variant="success" size="sm" className="p-1 ml-2" 
-          disabled={!!turn}
-          onClick={() => { handleStartGame() }} >Start</Button>
+          {ReadyStartButton()}
+          <Button style={{fontSize:"13px"}} className="p-1 mt-1" size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
       </Card.Footer>
     </Card>
   )

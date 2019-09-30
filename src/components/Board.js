@@ -1,14 +1,12 @@
-import React, {  useEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import Card from './Card'
 import GameContext from '../context/game-context'
-import getFrameworks from '../selectors/framework'
 
 const Board = () => {
-  const { wait, nextTurn, players, localPlayer, setLocalPlayer, frameworks, fwDispatch, dbRef } = useContext(GameContext)
-  const audio = new Audio()
+  const { setWait, audio, turn, nextTurn, canUpdateTurn, setCanUpdateTurn, openCard, setOpenCard, players, localPlayer, setLocalPlayer, frameworks, fwDispatch, dbRef } = useContext(GameContext)
 
   useEffect(() => {
-    if(wait) {
+    if(turn !== localPlayer.id) {
       dbRef.child("board").on("value", (snapshot) => {
         const board = snapshot.val()
         fwDispatch({ type: "POPULATE", board })
@@ -17,40 +15,16 @@ const Board = () => {
       dbRef.child("board").off()
     }
     // eslint-disable-next-line
-  }, [wait])
+  }, [turn])
   
   useEffect(() => {
-    dbRef.child("board").once("value", (snapshot) => {
-      fwDispatch({ type: "POPULATE", board: snapshot.val() })
-    })
-
-    dbRef.child("winner").on("child_added", (snapshot) => {
-      audio.src = process.env.PUBLIC_URL + "/winner.flac"
-      audio.play()
-      const winner = snapshot.val()
-      setTimeout(() => {
-        const startNew = window.confirm(`Winner: ${winner.username}! Would you like to start a new game?`)
-        if(startNew) {
-          snapshot.ref.remove()
-          dbRef.child("type").once("value", (snapshot) => {
-            setLocalPlayer({ ...localPlayer, point: 0 })
-            const board = getFrameworks(snapshot.val())
-            nextTurn()
-            fwDispatch({ type:"POPULATE", board })
-          })
-        } else {
-          dbRef.off()
-          window.location.href = "/"
-        }
-      },200)
-    })
-    // eslint-disable-next-line
-  }, [])
-
-  useEffect(() => {
     async function updateFrameworks() {
-      if(!wait && frameworks.length > 0) {
+      if(turn === localPlayer.id && frameworks.length > 0) {
         await dbRef.update({ board: frameworks })
+        if(canUpdateTurn){
+          await nextTurn()
+          setCanUpdateTurn(false)
+        }
         handleCheckWinner()
       }
     }
@@ -59,27 +33,29 @@ const Board = () => {
   }, [frameworks])
 
   const handleCardClick = async (index) => {
-    //eslint-disable-next-line
-    const opens = frameworks.reduce((m,e,i) => (e.isOpen === true && e.isMatch === false && m.push(i), m), [])
-    if(opens.length === 2) return
-
     audio.src = process.env.PUBLIC_URL + "/open.wav"
     audio.play()
     fwDispatch({ type:"OPEN", index })
-    if(opens.length === 1)  {
-      setTimeout(async () => await handleCheckMatch(index, opens[0]), 600)
+    if(openCard !== null)  {
+      setWait(true)
+      setTimeout(async () => await handleCheckMatch(index, openCard), 600)
+    } else {
+      setOpenCard(index)
     }
   }
   
   const handleCheckMatch = async (index, open) => {
+    setOpenCard(null)
     if(frameworks[index].name === frameworks[open].name) {
       audio.src = process.env.PUBLIC_URL + "/match.mp3"
       audio.play()
       fwDispatch({ type:"MATCH", index, open })
       setLocalPlayer({ ...localPlayer, point: ++localPlayer.point })
+      setWait(false)
     } else {
-      if(players.length > 1) await nextTurn()
-      else fwDispatch({ type:"CLOSE", index, open })
+      if(players.length === 1) setWait(false)
+      else setCanUpdateTurn(true)
+      fwDispatch({ type:"CLOSE", index, open })
     }
   }
 
