@@ -1,3 +1,5 @@
+![game](img/usememory.gif "Demonstration")
+
 <p align="center">
   <a href="https://react-online-memory-game.herokuapp.com/">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/768px-React-icon.svg.png" alt="Logo" width="210" height="150">
@@ -11,9 +13,6 @@
     <a target="_blank" href="https://react-online-memory-game.herokuapp.com/"><b>--- Live Server ---</b></a>
   </p>
   <br />
-  <p align="center">
-    ![use Memory](img/usememory.gif)
-  </p>
 </p>
 <hr />
 
@@ -34,3 +33,4 @@ The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
