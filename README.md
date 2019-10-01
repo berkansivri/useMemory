@@ -12,7 +12,7 @@
   </p>
   <br />
   <p align="center">
-    ![](useMemory.gif)
+    ![use Memory](img/usememory.gif)
   </p>
 </p>
 <hr />
