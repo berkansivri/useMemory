@@ -10,7 +10,7 @@
   <p align="center">
     Multiplayer (as many as you want) Memory Game on Firebase RealTime Database with React Hooks
     <br />
-    <a target="_blank" href="https://react-online-memory-game.herokuapp.com/"><b>--- Live Server ---</b></a>
+    <a target="_blank" href="http://usememory.herokuapp.com/"><b>--- Live Server ---</b></a>
   </p>
   <br />
 </p>
