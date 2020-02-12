@@ -23,7 +23,9 @@ body {
       margin-bottom:15px;
 	    transition: 0.6s;
 	    transform-style: preserve-3d;
-	    position: relative;
+      position: relative;
+      background: #f4f5f7;
+      border-width: 3px;
       div {
         backface-visibility: hidden;
         position: absolute;
@@ -33,7 +35,7 @@ body {
         height: 100%;
         border-radius: 10px;
         transition: 0.6s;
-        background: #f4f5f7; 
+        background: #f4f5f7;
       }
       .front { 
         font-size: 50px;
@@ -55,6 +57,7 @@ body {
           width: 80%;
           max-height: 90%;
           height: auto;
+          transform: translateZ(1px);
         }
       }
       &.opened {

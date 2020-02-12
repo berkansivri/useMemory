@@ -47,7 +47,7 @@ const Players = () => {
     {
       const everyoneReady = players && players.every((p) => p.isReady)
       return (
-        <Button style={{fontSize:"13px"}} variant={everyoneReady ? "success" : "secondary"} size="sm" className="p-1 ml-2" 
+        <Button style={{fontSize:"13px"}} variant={everyoneReady ? "success" : "secondary"} size="sm"
           disabled={!!turn}
           onClick={() => {
             if(everyoneReady) {
@@ -57,7 +57,7 @@ const Players = () => {
       )
     } else {
       return (
-        <Button style={{fontSize:"13px"}} variant={localPlayer.isReady ? "success" : "secondary"} size="sm" className="p-1" 
+        <Button style={{fontSize:"13px"}} variant={localPlayer.isReady ? "success" : "secondary"} size="sm"
           disabled={!!turn}
           onClick={() => {
             setLocalPlayer({ ...localPlayer, isReady: !localPlayer.isReady })         
@@ -82,8 +82,12 @@ const Players = () => {
         </ListGroup>
       </Card.Body>
       <Card.Footer className="p-1 text-center">
+        <div>
           {ReadyStartButton()}
-          <Button style={{fontSize:"13px"}} className="p-1 mt-1" size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
+        </div>
+        <div class="mt-1">
+          <Button style={{fontSize:"13px"}} size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
+        </div>
       </Card.Footer>
     </Card>
   )
