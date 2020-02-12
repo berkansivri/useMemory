@@ -49,6 +49,9 @@ body {
         //background: linear-gradient(to top, #FFFFFF, #ECE9E6);
       }
       .back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transform: rotateY(180deg);
         line-height: 86px;
         img {
