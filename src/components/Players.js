@@ -85,7 +85,7 @@ const Players = () => {
         <div>
           {ReadyStartButton()}
         </div>
-        <div class="mt-1">
+        <div className="mt-1">
           <Button style={{fontSize:"13px"}} size="sm" variant="warning" onClick={() => setShowInviteModal(true)}>Invite Link</Button>
         </div>
       </Card.Footer>
